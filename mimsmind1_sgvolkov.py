@@ -85,48 +85,70 @@
 
 # %%
 
+import sys
 import random
-def number():
-    digits = '123456789'
-    size = 3
-    secret_number = ''.join(random.sample(digits,size))
-    secret_number_str = str(secret_number)
-    len_secret = len(str(secret_number))
-    str_len_secret = str(len_secret)
-    maxrounds = (2**(len_secret)) + (len_secret)
-    #print chosen # Debug
-    print secret_number
-    print "\nLet's play the mimsmind1 game. You have " + str(maxrounds) +" guesses."
-    guesses = 0
+
+# Body   
+
+def get_length(): # gets the length or sets the default.
+    if len(sys.argv) == 2:
+        length = sys.argv[1]
+    else:
+        length = 3
+    return length  # this is a string. keep in mind it may need to be an int.
+
+def gen_random1(length):
+    number = ""
+    for n in range(int(length)): #the loop will run this many times, for the amount of digits 
+            number += str(random.randint(0,9))
+
+def get_maxrounds(length):
+    length = int(length)
+    maxrounds = 2**length + length
+
+def get_initial_guess(length):
+    guess = int(raw_input('\nGuess a {0}-digit number: '.format(length)))
+    guess_count = 1
+    return guess, guess_count
+
+def provide_feedback(guess, rand_num, guess_count):
     while True:
-        guesses += 1
-        guesses_left = maxrounds - guesses
-        while True:
-            # get a good guess
-            guess = raw_input('\nGuess a %i -digit number: ' % size).strip()
-            if len(guess) == size and \
-               all(char in digits for char in guess) \
-               and len(set(guess)) == size:
-                break
-            print "Problem, try again. You have %i guesses left" % guesses_left
-        if guess == secret_number:
-            print '\nCongratulations you guessed correctly in',guesses,'attempts'
+        if guess == rand_num:
+            print("\nCongratulations. You guess the correct number in {0} tries." .format(guess_count))
             break
-        if guesses == maxrounds:
-            print "Sorry. You did not guess the number in " + str_len_secret + " tries. The correct number is " + secret_number_str
-        bulls = cows = 0
-        for i in range(size):
-            if guess[i] == secret_number[i]:
+        cows = 0
+        bulls = 0
+        bull_idx = []
+        guess = str(guess)
+
+        #cycle through every digit in guess
+        #increment bulls if the digit matches the place of rand_num
+        #and add to bull_idx. Else, cycle through every digit in rand_num and 
+        #if the index of that digit is not in bull_idx and the digit equals
+        # a guess digit, it's a cow.
+        for n, digit in enumerate(guess):
+            if digit == rand_num[n]:
                 bulls += 1
-            elif guess[i] in secret_number:
-                cows += 1
-        print ' %i Bulls\n %i Cows' % (bulls, cows)
-        print "Try again. You have " + str(guesses_left) + " guesses left: "
+                bull_ix.append(n)  # removing this bull from consideration
+            else:
+                for n, x in enumerate(rand_num):
+                    if n not in bull_idx:
+                        if digit == x:
+                            cows += 1
+        print cows, bulls
+        return
+
+        guess_count += 1
+
 
 ################################################################################
 def main():
 
-    number()
+    length = get_length() #variables are called here
+    rand_num = gen_random1(length)
+    maxrounds = get_maxrounds(length)
+    guess, guess_count = get_initial_guess(length)
+    provide_feedback(guess, rand_num, guess_count)
 
 if __name__ == '__main__':
     main()
